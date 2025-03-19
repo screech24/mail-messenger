@@ -40,11 +40,19 @@
 - Updated App.js to test state management
 - Verified state management works correctly
 
+### Step 5: Initialize Three.js Scene in React Complete
+- Set up a Three.js scene in GameCanvas.js using useEffect
+- Created a perspective camera with 75-degree FOV
+- Initialized a WebGL renderer targeting a canvas ref
+- Set up a basic animation loop using requestAnimationFrame
+- Implemented a resize handler for responsive canvas
+- Added basic lighting (ambient + directional)
+- Added a simple ground plane for visual reference
+- Verified the scene renders correctly in the browser
+
 ### Next Steps
-- Step 5: Initialize Three.js Scene in React
-  - Set up a Three.js scene in GameCanvas.js using useEffect
-  - Create a perspective camera with 75-degree FOV
-  - Initialize a WebGL renderer
-  - Set up a basic animation loop
-  - Implement a resize handler for responsive canvas
-  - Add basic lighting
+- Step 6: Implement Asset Loading Manager
+  - Create src/game/assetManager.js to handle asset loading
+  - Implement a Three.js LoadingManager to track loading progress
+  - Create functions to generate procedural assets using Three.js
+  - Add loading progress UI component
