@@ -5,10 +5,9 @@ import useGameStore from './gameStore';
 // Physics world configuration
 let world = null;
 let physicsBodies = {};
-let lastTime = 0;
+let lastReportedPosition = new Vector3();
 
 // Physics materials
-const defaultMaterial = new CANNON.Material('default');
 const playerMaterial = new CANNON.Material('player');
 const groundMaterial = new CANNON.Material('ground');
 const buildingMaterial = new CANNON.Material('building');
@@ -96,6 +95,9 @@ export const createPlayerPhysics = (position) => {
   
   // Store reference
   physicsBodies.player = body;
+  
+  // Initialize last reported position
+  lastReportedPosition = new Vector3(position.x, position.y, position.z);
   
   return body;
 };
@@ -197,10 +199,20 @@ const syncBodies = () => {
   // Sync player position
   if (physicsBodies.player) {
     const pos = physicsBodies.player.position;
-    const playerPosition = new Vector3(pos.x, pos.y - 0.9, pos.z); // Adjust height to account for shape
+    const newPosition = new Vector3(pos.x, pos.y - 0.9, pos.z); // Adjust height to account for shape
     
-    // Update the store with the new position from physics
-    useGameStore.getState().updatePlayerPosition(playerPosition);
+    // Only update position if it has changed significantly
+    if (!newPosition.equals(lastReportedPosition) && 
+        (Math.abs(newPosition.x - lastReportedPosition.x) > 0.001 || 
+         Math.abs(newPosition.y - lastReportedPosition.y) > 0.001 || 
+         Math.abs(newPosition.z - lastReportedPosition.z) > 0.001)) {
+      
+      // Update the store with the new position from physics
+      useGameStore.getState().updatePlayerPosition(newPosition);
+      
+      // Save last reported position
+      lastReportedPosition.copy(newPosition);
+    }
   }
   
   // Other objects could be synced here
@@ -228,6 +240,7 @@ export const resetPhysics = () => {
     
     // Clear references
     physicsBodies = {};
+    lastReportedPosition = new Vector3();
   }
 };
 
@@ -235,7 +248,10 @@ export const resetPhysics = () => {
 export const handleCollisions = () => {
   if (!world) return;
   
-  world.addEventListener('beginContact', (event) => {
+  // Store world reference in local constant to avoid closure issues
+  const physicsWorld = world;
+  
+  physicsWorld.addEventListener('beginContact', (event) => {
     // Check if player is involved in collision
     const isPlayerCollision = 
       event.bodyA === physicsBodies.player || 

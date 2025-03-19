@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Vector3 } from 'three';
 import useGameStore from '../game/gameStore';
 import { movePlayer } from '../game/physics';
@@ -10,6 +10,10 @@ const InputHandler = () => {
   const setInputState = useGameStore(state => state.setInputState);
   const resetInputState = useGameStore(state => state.resetInputState);
   const updatePlayerSpeed = useGameStore(state => state.updatePlayerSpeed);
+  
+  // Use a ref to track the previous move direction to prevent unnecessary updates
+  const prevMoveDirectionRef = useRef(new Vector3(0, 0, 0));
+  const speedRef = useRef(0);
   
   // Set up keyboard event listeners
   useEffect(() => {
@@ -114,22 +118,28 @@ const InputHandler = () => {
         // For now, using a fixed speed for rollerblades
         const speed = 500; // Force magnitude for physics
         
-        // Apply movement via physics engine
-        movePlayer(moveDirection, speed);
-        
-        // Update player speed in store for UI or other systems
-        updatePlayerSpeed(speed);
-      } else {
-        // Player is not moving
+        // Only apply movement if direction changed
+        if (!prevMoveDirectionRef.current.equals(moveDirection) || speedRef.current !== speed) {
+          // Apply movement via physics engine
+          movePlayer(moveDirection, speed);
+          
+          // Update player speed in store for UI or other systems
+          updatePlayerSpeed(speed);
+          
+          // Update refs for next comparison
+          prevMoveDirectionRef.current.copy(moveDirection);
+          speedRef.current = speed;
+        }
+      } else if (prevMoveDirectionRef.current.length() > 0) {
+        // Player has stopped moving
+        prevMoveDirectionRef.current.set(0, 0, 0);
+        speedRef.current = 0;
         updatePlayerSpeed(0);
       }
     };
     
-    // Process movement immediately and set up interval for continuous updates
+    // Process movement immediately
     processMovement();
-    
-    // Currently we don't need an interval because physics steps are called in animation loop
-    // But we could add one if we want input processing to happen at a different rate
     
   }, [inputState, playerPosition, updatePlayerSpeed]);
   

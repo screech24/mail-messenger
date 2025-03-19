@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import useGameStore from '../game/gameStore';
 import { loadingManager, createPlayerModel, createBuildingModel, createTerrainModel } from '../game/assetManager';
@@ -23,15 +23,21 @@ const GameCanvas = () => {
   const lastTimeRef = useRef(0);
   // Physics refs
   const physicsWorldRef = useRef(null);
+  // Add a ref to track initialization
+  const initializedRef = useRef(false);
 
   // Game state
   const isLoading = useGameStore(state => state.loadingState.isLoading);
   const playerPosition = useGameStore(state => state.playerState.position);
-  const updatePlayerPosition = useGameStore(state => state.updatePlayerPosition);
+  const setAssetsLoaded = useGameStore(state => state.setAssetsLoaded);
 
+  // Separate effect for scene initialization
   useEffect(() => {
-    // Don't initialize if we're still loading or no canvas ref
-    if (isLoading || !canvasRef.current) return;
+    // Only initialize once when loading is complete
+    if (isLoading || !canvasRef.current || initializedRef.current) return;
+    
+    initializedRef.current = true;
+    console.log('Initializing scene...');
 
     // Initialize Three.js scene
     const initScene = () => {
@@ -135,8 +141,11 @@ const GameCanvas = () => {
         });
       }
 
-      // Signal that all assets are loaded
-      useGameStore.getState().setAssetsLoaded(true);
+      // Signal that all assets are loaded - do this after everything is initialized
+      // Using setTimeout to break the render cycle
+      setTimeout(() => {
+        setAssetsLoaded(true);
+      }, 0);
     };
 
     // Animation loop
@@ -212,7 +221,22 @@ const GameCanvas = () => {
       playerRef.current = null;
       physicsWorldRef.current = null;
     };
-  }, [isLoading, playerPosition]); // Dependencies include isLoading and playerPosition
+  }, [isLoading, setAssetsLoaded]); // Only depend on isLoading, not playerPosition
+
+  // Separate effect for updating player and camera position
+  useEffect(() => {
+    if (playerRef.current) {
+      playerRef.current.position.copy(playerPosition);
+    }
+    
+    if (cameraRef.current) {
+      // Position camera behind player with slight offset and height
+      cameraRef.current.position.x = playerPosition.x;
+      cameraRef.current.position.z = playerPosition.z + 5; // Camera follows behind at distance of 5
+      cameraRef.current.position.y = playerPosition.y + 1.7; // Camera at eye level
+      cameraRef.current.lookAt(playerPosition); // Look at player
+    }
+  }, [playerPosition]);
 
   // Don't render canvas if loading
   if (isLoading) return null;
