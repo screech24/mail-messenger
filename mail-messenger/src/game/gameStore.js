@@ -36,6 +36,15 @@ const useGameStore = create((set) => ({
     assetsLoaded: false,
   },
   
+  // Input state for player control
+  inputState: {
+    forward: false,
+    backward: false,
+    left: false,
+    right: false,
+    jump: false,
+  },
+  
   // Actions for player state
   updatePlayerPosition: (position) => 
     set((state) => ({
@@ -66,6 +75,14 @@ const useGameStore = create((set) => ({
       playerState: {
         ...state.playerState,
         hasMail,
+      }
+    })),
+  
+  updatePlayerSpeed: (speed) =>
+    set((state) => ({
+      playerState: {
+        ...state.playerState,
+        speed,
       }
     })),
   
@@ -159,6 +176,26 @@ const useGameStore = create((set) => ({
         ...state.loadingState,
         assetsLoaded,
         isLoading: !assetsLoaded,
+      }
+    })),
+    
+  // Actions for input state
+  setInputState: (input, value) => 
+    set((state) => ({
+      inputState: {
+        ...state.inputState,
+        [input]: value,
+      }
+    })),
+    
+  resetInputState: () =>
+    set((state) => ({
+      inputState: {
+        forward: false,
+        backward: false,
+        left: false,
+        right: false,
+        jump: false,
       }
     })),
 }));

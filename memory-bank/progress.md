@@ -63,10 +63,27 @@
 - Updated App.js to initialize and simulate the loading process
 - Verified assets load with progress indicator before game starts
 
+### Step 7: Implement Physics with Cannon.js Complete
+- Created src/game/physics.js to manage Cannon.js integration
+- Set up a physics world with gravity
+- Implemented physics materials and contact materials for different interactions
+- Created physics bodies for:
+  - Player character (using a cylinder shape)
+  - Ground/terrain (using a plane)
+  - Buildings and obstacles (using boxes with different dimensions)
+- Implemented physics step function to update the world
+- Created InputHandler component to process keyboard inputs
+- Added player movement with physics forces
+- Updated gameStore with input state management
+- Updated UI to display physics-related information
+- Synced Three.js objects with Cannon.js bodies in the animation loop
+- Implemented collision detection and handling
+- Verified physics calculations are applied to objects
+
 ### Next Steps
-- Step 7: Implement Physics with Cannon.js
-  - Create src/game/physics.js to manage Cannon.js integration
-  - Set up a physics world with gravity
-  - Create physics bodies for player, ground, and buildings
-  - Implement physics step function
-  - Sync Three.js objects with Cannon.js bodies
+- Step 8: Build Procedural Environment
+  - Generate ground plane with texture
+  - Place buildings in a grid pattern using noise algorithms
+  - Add decorative elements (trees, benches, lampposts)
+  - Apply cel shaders for Ghibli-inspired style
+  - Implement culling system for performance

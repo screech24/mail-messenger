@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import GameCanvas from './components/GameCanvas';
 import UI from './components/UI';
 import LoadingScreen from './components/LoadingScreen';
+import InputHandler from './components/InputHandler';
 import useGameStore from './game/gameStore';
 import './App.css';
 
@@ -54,6 +55,7 @@ function App() {
       <LoadingScreen />
       <GameCanvas />
       <UI />
+      <InputHandler />
     </div>
   );
 }
