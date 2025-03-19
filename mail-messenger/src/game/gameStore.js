@@ -29,6 +29,13 @@ const useGameStore = create((set) => ({
     controlsEnabled: true,
   },
   
+  // Asset loading state
+  loadingState: {
+    isLoading: true,
+    progress: 0, // 0-1
+    assetsLoaded: false,
+  },
+  
   // Actions for player state
   updatePlayerPosition: (position) => 
     set((state) => ({
@@ -126,6 +133,32 @@ const useGameStore = create((set) => ({
       settingsState: {
         ...state.settingsState,
         controlsEnabled: enabled,
+      }
+    })),
+    
+  // Actions for loading state
+  setLoading: (isLoading) => 
+    set((state) => ({
+      loadingState: {
+        ...state.loadingState,
+        isLoading,
+      }
+    })),
+  
+  setLoadingProgress: (progress) => 
+    set((state) => ({
+      loadingState: {
+        ...state.loadingState,
+        progress,
+      }
+    })),
+  
+  setAssetsLoaded: (assetsLoaded) => 
+    set((state) => ({
+      loadingState: {
+        ...state.loadingState,
+        assetsLoaded,
+        isLoading: !assetsLoaded,
       }
     })),
 }));
