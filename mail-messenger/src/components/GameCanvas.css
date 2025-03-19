@@ -1,0 +1,15 @@
+.game-canvas-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background-color: #444; /* Slightly lighter than App background for contrast */
+}
+
+.game-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+} 
